@@ -20,8 +20,9 @@ router.post(
   ],
   async (req, res) => {
     const errors = validationResult(req);
+    let success=false;
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({success, errors: errors.array() });
     }
 
     let user = await User.findOne({ email: req.body.email });
@@ -30,7 +31,7 @@ router.post(
       if (user) {
         return res
           .status(400)
-          .json({ error: "Sorry a user will this email already exits" });
+          .json({success, error: "Sorry a user will this email already exits" });
       }
 
 
@@ -57,7 +58,9 @@ router.post(
       };
 
       const authtoken = jwt.sign(data, JWT_SECRET);
-      res.json({ authtoken });
+
+      success=true;
+      res.json({ success,authtoken });
     } catch (error) {
       console.log(error.message);
       res.status(500).send("Some error occured in auth");
@@ -81,6 +84,7 @@ router.post(
 
     const {email,password}=req.body;
     try {
+      let success=false;
       let user=await User.findOne({email});
       if(!user){
         return res.status(400).json({error:"Please login with correct credentials"});
@@ -88,7 +92,7 @@ router.post(
 
       const passwordCompare=await bcrypt.compare(password,user.password);
       if(!passwordCompare){
-        return res.status(400).json({error:"Please login with correct credentials"});
+        return res.status(400).json({success,error:"Please login with correct credentials"});
       }
 
       //Here we are json web token which helps us to know whether user has change his details or not or can say matching the data that sent and receive
@@ -99,7 +103,8 @@ router.post(
       };
 
       const authtoken = jwt.sign(data, JWT_SECRET);
-      res.json({ authtoken });
+      success=true;
+      res.json({success, authtoken });
 
     } catch (error) {
       console.log(error.message);
@@ -115,7 +120,7 @@ router.post(
   fetchuser,
   async (req, res) => {
 try {
-    userId=req.user.id;
+    const userId=req.user.id;
     const user=await User.findById(userId).select("-password");
     res.send(user);
 } catch (error) {

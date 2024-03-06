@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "react-router-dom": "^6.22.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build":"react-scripts build",
+    "both":"concurrently \"npm run start\" \"node backend/index.js\""
+  }
+}
